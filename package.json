@@ -1,0 +1,33 @@
+{
+  "name": "easybangumi-jsdev",
+  "author": "AyalaKaguya",
+  "version": "1.0.0",
+  "description": "为开发纯纯看番JS插件源提供类型与工具链支持",
+  "license": "MIT",
+  "private": false,
+  "types": "./lib/globals.d.ts",
+  "files": [
+    "lib/",
+    "bin/"
+  ],
+  "bin": {
+    "ebjsdev": "bin/devserver.js"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easybangumiorg/JsDev.git"
+  },
+  "keywords": [
+    "easybangumi",
+    "type-def"
+  ],
+  "bugs": {
+    "url": "https://github.com/easybangumiorg/JsDev/issues"
+  },
+  "homepage": "https://github.com/easybangumiorg/JsDev#readme"
+}

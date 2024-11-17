@@ -274,6 +274,8 @@ declare class SubTab {
     label: string;
     active: boolean;
     index: number;
+
+    ext:number = this.index;
 }
 
 declare class PlayLine {

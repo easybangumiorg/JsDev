@@ -7,11 +7,12 @@
 // 公共代码开始 ========================================
 var networkHelper = Inject_NetworkHelper;
 var preferenceHelper = Inject_PreferenceHelper;
+var okHttpHelper = Inject_OkhttpHelper;
 var webViewHelperV2 = Inject_WebViewHelperV2;
 var stringHelper = Inject_StringHelper;
 
 var plugin = {
-    debug: preferenceHelper.get("ayala.sbr.debug", false),
+    debug_mode: preferenceHelper.get("ayala.sbr.debug", false),
     debug_server: "http://192.168.0.108:3000",
     preferences: new ArrayList(),
     init: false,
@@ -25,6 +26,7 @@ var plugin = {
         });
     },
     _getMainTabs() {
+        this.debug.i("plugin._getMainTabs", "获取所有页面");
         var tabs = new ArrayList();
         this.pagemap.keySet().forEach(tab => {
             var value = this.pagemap.get(tab);
@@ -32,10 +34,10 @@ var plugin = {
         })
         return tabs;
     },
-    _getSubTabs(mainTab) {
-        stringHelper.toast("getSubTabs:" + mainTab.label);
-        var page = this.pagemap.get(mainTab.label);
+    _checkSubTab(mainTabLabel) {
+        var page = this.pagemap.get(mainTabLabel);
         if (page.subtab == null) {
+            this.debug.i("plugin._checkSubTab", "计算子页面：" + mainTabLabel);
             var tab = {
                 type: 'none',
                 content: new HashMap(),
@@ -56,8 +58,12 @@ var plugin = {
             }
             page.callback(tab);
             page.subtab = tab;
-            this.pagemap.put(mainTab.label, page);
+            this.pagemap.put(mainTabLabel, page);
         }
+        return page
+    },
+    _getSubTabs(mainTab) {
+        var page = this._checkSubTab(mainTab.label);
         switch (page.subtab.type) {
             case 'pages':
                 var tabs = new ArrayList();
@@ -71,18 +77,43 @@ var plugin = {
         }
     },
     _getContent(mainTab, subTab, page) {
-        stringHelper.toast("getContent:" + mainTab.label + ":" + subTab.label);
-        var page = this.pagemap.get(mainTab.label);
+        var page = this._checkSubTab(mainTab.label);
         switch (page.subtab.type) {
             case 'only':
+                this.debug.i("plugin._getContent", "获取页面内容：" + mainTab.label);
                 return page.subtab.content(page);
             case 'pages':
-                var value = page.second.content.get(subTab.label);
-                return value.callback(page);
+                this.debug.i("plugin._getContent", "获取页面内容：" + mainTab.label + " - " + subTab.label);
+                var subTab = page.subtab.content.get(subTab.label);
+                return subTab.callback(page);
         }
         return new Pair(null, new ArrayList());
+    },
+    debug: {
+        lograw(object) {
+            if (plugin.debug_mode) {
+                var debug_server = preferenceHelper.get("ayala.sbr.devServer", plugin.debug_server);
+                var client = okHttpHelper.client
+                var requestBody = RequestBody.create(
+                    MediaType.get('application/json; charset=utf-8'),
+                    JSON.stringify(object));
+                var request = new Request.Builder()
+                    .url(debug_server + "/log")
+                    .post(requestBody)
+                    .build();
+                var response = client.newCall(request).execute();
+                var responseBody = response.body().string();
+                return responseBody;
+            }
+        },
+        i(label, msg) {
+            return this.lograw({
+                level: "info",
+                label: label,
+                msg: msg,
+            });
+        }
     }
-
 }
 
 plugin.init = (function () {
@@ -108,7 +139,6 @@ function PageComponent_getMainTabs() {
 }
 
 function PageComponent_getSubTabs(mainTab) {
-    stringHelper.toast("getSubTabs:"+mainTab.label);
     return plugin._getSubTabs(mainTab);
 }
 
@@ -126,6 +156,7 @@ plugin.preferences.add(new SourcePreference.Edit(
 
 plugin.page("首页", MainTab.MAIN_TAB_WITH_COVER, tab => {
     tab.only(page => {
+        stringHelper.toast("首页开始加载")
         return new Pair(null, new ArrayList());
         // return getHome(page);
     })

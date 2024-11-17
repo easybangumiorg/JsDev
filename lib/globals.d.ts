@@ -1,31 +1,31 @@
 // ===== 全局变量与类声明 =====
-declare class ArrayList<T = any> extends Iterable<T> {
+declare class ArrayList<T = any> {
     add(element: T): boolean;
     size(): number;
-};
+}
 
 declare class Pair<K, V> {
     constructor(first: K, second: V);
 
     first: K;
     second: V;
-};
+}
 
 declare namespace Package {
     namespace com {
         namespace heyanle {
             namespace easybangumi4 {
                 let _: any;
-            };
-        };
-    };
-    namespace kotlin { let _: any; };
-    namespace java { let _: any; };
+            }
+        }
+    }
+    namespace kotlin { let _: any; }
+    namespace java { let _: any; }
     namespace org {
-        namespace jsoup { let _: any; };
-    };
-    namespace okhttp3 { let _: any; };
-};
+        namespace jsoup { let _: any; }
+    }
+    namespace okhttp3 { let _: any; }
+}
 
 
 declare function importPackage(pkg: any): void;
@@ -141,7 +141,7 @@ declare namespace WebViewHelperV2 {
         timeout: number;
 
         constructor(url: string, reg: string, encode: string, user_agent: string, header: Map<string, string> | null, action_js: string | null, needBlob: boolean, timeout: number);
-    };
+    }
 
     interface RenderedResult {
         // 策略
@@ -191,17 +191,17 @@ declare namespace SourcePreference {
     class BasePreference {
         label: string;
         key: string;
-    };
+    }
 
     class Edit extends BasePreference {
         default_: string;
         constructor(label: string, key: string, default_: string);
-    };
+    }
 
     class Switch extends BasePreference {
         default_: boolean;
         constructor(label: string, key: string, default_: boolean);
-    };
+    }
 
     class Selection extends BasePreference {
         default_: string;

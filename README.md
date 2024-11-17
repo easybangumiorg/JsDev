@@ -1,19 +1,26 @@
 # EasyBangumi JsDev
 
-为开发纯纯看番JS插件源提供类型与工具链支持
+<p>
+    <img alt="release" src="https://img.shields.io/github/v/release/easybangumiorg/JsDev" />
+    <img alt="license" src="https://img.shields.io/github/license/easybangumiorg/JsDev" />
+    <img alt="issues" src="https://img.shields.io/github/issues/easybangumiorg/JsDev" />
+    <img alt="NPM Last Update" src="https://img.shields.io/npm/last-update/easybangumi-jsdev">
+</p>
 
-让你免受gradle sync之苦（恼
+为开发纯纯看番 JS 插件源提供类型与工具链支持
+
+让你免受 gradle sync 之苦（恼
 
 ## 安装依赖
 
-你需要先创建一个开发文件夹并按一下要求配置环境。
+你需要先创建一个开发文件夹并按以下要求配置环境。
 
 ```shell
 npm init
 npm install easybangumi-jsdev
 ```
 
-可以到`node_modules/easybangumi-jsdev/src`下获取一份better_startup.js作为你项目的开始。如果找不到可以到[easybangumiorg/JsDev](https://github.com/easybangumiorg/JsDev)仓库的`src`目录下寻找。
+可以到`node_modules/easybangumi-jsdev/src`下获取一份 better_startup.js 作为你项目的开始。如果找不到可以到[easybangumiorg/JsDev](https://github.com/easybangumiorg/JsDev)仓库的`src`目录下寻找。
 
 如果无法正确的获得类型提示，检查是否安装了`IntelliCode`这类插件。
 

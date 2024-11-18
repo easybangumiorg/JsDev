@@ -22,7 +22,11 @@ npm install easybangumi-jsdev
 
 可以到`node_modules/easybangumi-jsdev/src`下获取一份 better_startup.js 作为你项目的开始。如果找不到可以到[easybangumiorg/JsDev](https://github.com/easybangumiorg/JsDev)仓库的`src`目录下寻找。
 
+## 类型提示
+
 如果无法正确的获得类型提示，检查是否安装了`IntelliCode`这类插件。
+
+此外，你可以试试打开一下`node_modules/easybangumi-jsdev/lib/globals.d.ts`，或许可以解决类型提示的问题。（玄学
 
 ## 启动调试服务器
 

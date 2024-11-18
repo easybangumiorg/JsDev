@@ -1,6 +1,6 @@
 // @key ayala.sbr
 // @label 更好的起始源
-// @versionName 1.0
+// @versionName 1.1
 // @versionCode 1
 // @libVersion 11
 
@@ -15,29 +15,51 @@ var plugin = {
     debug_mode: preferenceHelper.get("ayala.sbr.debug", false),
     debug_server: "http://192.168.0.108:3000",
     preferences: new ArrayList(),
-    init: false,
+    is_init: false,
+    _inits: [context => {
+        context.preferences.add(new SourcePreference.Switch(
+            "调试模式",
+            "ayala.sbr.debug",
+            false
+        ))
+        context.preferences.add(new SourcePreference.Edit(
+            "调试服务器地址",
+            "ayala.sbr.devServer",
+            plugin.debug_server
+        ))
+    },],
+    onInit(callback) {
+        this._inits.push(callback);
+    },
+    _onInit() {
+        if (this.is_init) return;
+        this._inits.forEach(callback => callback(this));
+        this.is_init = true;
+    },
     pagemap: new HashMap(),
-    page(name, type, callback) {
-        var page = new MainTab(name, type);
+    page(name, callback) {
         this.pagemap.put(name, {
-            page: page,
+            page: null,
             callback: callback,
-            subtab: null
+            subtab: null,
+            index: this.pagemap.keySet().size()
         });
     },
     _getMainTabs() {
-        this.debug.i("plugin._getMainTabs", "获取所有页面");
+        this.log.i("plugin._getMainTabs", "获取所有页面");
         var tabs = new ArrayList();
         this.pagemap.keySet().forEach(tab => {
-            var value = this.pagemap.get(tab);
-            tabs.add(value.page);
+            tabs.add(this._checkSubTab(tab));
         })
-        return tabs;
+        tabs.sort((a, b) => a.index - b.index);
+        var main_tabs = new ArrayList();
+        tabs = tabs.forEach(tab => main_tabs.add(tab.page));
+        return main_tabs;
     },
     _checkSubTab(mainTabLabel) {
         var page = this.pagemap.get(mainTabLabel);
         if (page.subtab == null) {
-            this.debug.i("plugin._checkSubTab", "计算子页面：" + mainTabLabel);
+            this.log.i("plugin._checkSubTab", "计算子页面：" + mainTabLabel);
             var tab = {
                 type: 'none',
                 content: new HashMap(),
@@ -46,7 +68,10 @@ var plugin = {
                     this.content = callback;
                 },
                 subpage(name, index, is_active, callback) {
-                    if (this.type == 'only') return;
+                    if (this.type == 'only') {
+                        this.log.w("plugin._checkSubTab", "页面已被设置为only，将跳过设置subpage：" + mainTabLabel);
+                        return
+                    };
                     this.type = 'pages';
                     this.content.put(name, {
                         name: name,
@@ -58,6 +83,12 @@ var plugin = {
             }
             page.callback(tab);
             page.subtab = tab;
+            if (page.subtab.type == 'none')
+                this.log.e("plugin._checkSubTab", "页面未设置tab，这将导致在后续的过程中报错：" + mainTabLabel);
+            if (page.subtab.type == 'pages')
+                page.page = new MainTab(mainTabLabel, MainTab.MAIN_TAB_GROUP);
+            if (page.subtab.type == 'only')
+                page.page = new MainTab(mainTabLabel, MainTab.MAIN_TAB_WITH_COVER);
             this.pagemap.put(mainTabLabel, page);
         }
         return page
@@ -71,6 +102,7 @@ var plugin = {
                     var value = page.subtab.content.get(key);
                     tabs.add(new SubTab(value.name, value.is_active, value.index));
                 })
+                tabs.sort((a, b) => a.ext - b.ext);
                 return tabs;
             default:
                 return new ArrayList();
@@ -80,16 +112,16 @@ var plugin = {
         var page = this._checkSubTab(mainTab.label);
         switch (page.subtab.type) {
             case 'only':
-                this.debug.i("plugin._getContent", "获取页面内容：" + mainTab.label);
+                this.log.i("plugin._getContent", "获取页面内容：" + mainTab.label);
                 return page.subtab.content(page);
             case 'pages':
-                this.debug.i("plugin._getContent", "获取页面内容：" + mainTab.label + " - " + subTab.label);
+                this.log.i("plugin._getContent", "获取页面内容：" + mainTab.label + " - " + subTab.label);
                 var subTab = page.subtab.content.get(subTab.label);
                 return subTab.callback(page);
         }
         return new Pair(null, new ArrayList());
     },
-    debug: {
+    log: {
         lograw(object) {
             if (plugin.debug_mode) {
                 var debug_server = preferenceHelper.get("ayala.sbr.devServer", plugin.debug_server);
@@ -107,30 +139,34 @@ var plugin = {
             }
         },
         i(label, msg) {
+            JSLogUtils.i(label, JSON.stringify(msg));
             return this.lograw({
                 level: "info",
                 label: label,
                 msg: msg,
             });
-        }
+        },
+        w(label, msg) {
+            JSLogUtils.w(label, JSON.stringify(msg));
+            return this.lograw({
+                level: "warn",
+                label: label,
+                msg: msg,
+            });
+        },
+        e(label, msg) {
+            JSLogUtils.e(label, JSON.stringify(msg));
+            return this.lograw({
+                level: "error",
+                label: label,
+                msg: msg,
+            });
+        },
     }
 }
 
-plugin.init = (function () {
-    plugin.preferences.add(new SourcePreference.Switch(
-        "调试模式",
-        "ayala.sbr.debug",
-        false
-    ))
-    plugin.preferences.add(new SourcePreference.Edit(
-        "调试服务器地址",
-        "ayala.sbr.devServer",
-        plugin.debug_server
-    ))
-    return true
-})()
-
 function PreferenceComponent_getPreference() {
+    plugin._onInit();
     return plugin.preferences;
 }
 
@@ -148,13 +184,12 @@ function PageComponent_getContent(mainTab, subTab, page) {
 
 // 项目代码开始 ========================================
 plugin.preferences.add(new SourcePreference.Edit(
-    "目标地址",
-    "ayala.sbr.url",
+    "首页地址",
+    "ayala.sbr.home",
     "https://sbr.ayala.workers.dev"
 ))
 
-
-plugin.page("首页", MainTab.MAIN_TAB_WITH_COVER, tab => {
+plugin.page("首页", tab => {
     tab.only(page => {
         stringHelper.toast("首页开始加载")
         return new Pair(null, new ArrayList());
@@ -162,10 +197,10 @@ plugin.page("首页", MainTab.MAIN_TAB_WITH_COVER, tab => {
     })
 })
 
-plugin.page("排期", MainTab.MAIN_TAB_GROUP, tab => {
+plugin.page("排期", tab => {
     var weekLabel = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
-    weekLabel.forEach((value, index) => {
-        tab.subpage(value, index, true, page => {
+    weekLabel.forEach((label, index) => {
+        tab.subpage(label, index, true, page => {
             return new Pair(null, new ArrayList());
             // return getTimeLine(index, page);
         })

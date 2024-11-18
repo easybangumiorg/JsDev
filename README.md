@@ -20,13 +20,15 @@ npm init
 npm install easybangumi-jsdev
 ```
 
-可以到`node_modules/easybangumi-jsdev/src`下获取一份 better_startup.js 作为你项目的开始。如果找不到可以到[easybangumiorg/JsDev](https://github.com/easybangumiorg/JsDev)仓库的`src`目录下寻找。
+可以到[easybangumiorg/JsDev](https://github.com/easybangumiorg/JsDev)仓库的`src`目录下复制一份`better_startup.js`作为你项目的开始，better_startup会为你提供一些实用工具满足你的开发需求。
+
+之后将通过npm模板创建项目，解决不能直接获取到类型提示的问题。
 
 ## 类型提示
 
 如果无法正确的获得类型提示，检查是否安装了`IntelliCode`这类插件。
 
-此外，你可以试试打开一下`node_modules/easybangumi-jsdev/lib/globals.d.ts`，或许可以解决类型提示的问题。（玄学
+此外，你可以试试打开一下`node_modules/easybangumi-jsdev/lib/globals.d.ts`，或许可以解决类型提示的问题。
 
 ## 启动调试服务器
 
@@ -34,7 +36,7 @@ npm install easybangumi-jsdev
 npx ebjsdev
 ```
 
-在插件设置中将调试开关打开，并设置到调试服务器的地址即可获取插件运行的日志。
+在插件设置中将调试开关打开，并设置调试服务器的地址即可获取插件运行的日志。
 
 ~~这服务器太简陋了~~
 

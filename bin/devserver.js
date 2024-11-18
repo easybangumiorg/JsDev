@@ -50,7 +50,7 @@ const server = http.createServer((req, res) => {
         fs.readFile(filePath, 'utf8', (err, data) => {
             if (err) {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Error');
+                res.end('File Error');
                 return;
             }
             res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });

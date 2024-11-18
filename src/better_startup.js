@@ -16,26 +16,6 @@ var plugin = {
     debug_server: "http://192.168.0.108:3000",
     preferences: new ArrayList(),
     is_init: false,
-    _inits: [context => {
-        context.preferences.add(new SourcePreference.Switch(
-            "调试模式",
-            "ayala.sbr.debug",
-            false
-        ))
-        context.preferences.add(new SourcePreference.Edit(
-            "调试服务器地址",
-            "ayala.sbr.devServer",
-            plugin.debug_server
-        ))
-    },],
-    onInit(callback) {
-        this._inits.push(callback);
-    },
-    _onInit() {
-        if (this.is_init) return;
-        this._inits.forEach(callback => callback(this));
-        this.is_init = true;
-    },
     pagemap: new HashMap(),
     page(name, callback) {
         this.pagemap.put(name, {
@@ -165,8 +145,22 @@ var plugin = {
     }
 }
 
+// 何言说了，插件生命周期之后提供，那么我们就在这里初始化
+plugin.is_init = (function () {
+    context.preferences.add(new SourcePreference.Switch(
+        "调试模式",
+        "ayala.sbr.debug",
+        false
+    ))
+    context.preferences.add(new SourcePreference.Edit(
+        "调试服务器地址",
+        "ayala.sbr.devServer",
+        plugin.debug_server
+    ))
+    return true;
+})();
+
 function PreferenceComponent_getPreference() {
-    plugin._onInit();
     return plugin.preferences;
 }
 
@@ -184,8 +178,8 @@ function PageComponent_getContent(mainTab, subTab, page) {
 
 // 项目代码开始 ========================================
 plugin.preferences.add(new SourcePreference.Edit(
-    "首页地址",
-    "ayala.sbr.home",
+    "目标地址",
+    "ayala.sbr.url",
     "https://sbr.ayala.workers.dev"
 ))
 

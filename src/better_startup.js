@@ -1,7 +1,7 @@
 // @key ayala.sbr
 // @label 更好的起始源
-// @versionName 1.1
-// @versionCode 1
+// @versionName 1.2
+// @versionCode 3
 // @libVersion 11
 
 // 公共代码开始 ========================================
@@ -13,9 +13,16 @@ var stringHelper = Inject_StringHelper;
 
 var plugin = {
     debug_mode: preferenceHelper.get("ayala.sbr.debug", false),
-    debug_server: "http://192.168.0.108:3000",
+    debug_server: "http://localhost:3000",
     preferences: new ArrayList(),
     is_init: false,
+    _onBeforeMainTab_hooks: [],
+    onBeforeMainTab(hook) {
+        this._onBeforeMainTab_hooks.push(hook);
+    },
+    _onBeforeMainTab() {
+        this._onBeforeMainTab_hooks.forEach(hook => hook());
+    },
     pagemap: new HashMap(),
     page(name, callback) {
         this.pagemap.put(name, {
@@ -102,7 +109,7 @@ var plugin = {
         return new Pair(null, new ArrayList());
     },
     log: {
-        lograw(object) {
+        raw(object) {
             if (plugin.debug_mode) {
                 var debug_server = preferenceHelper.get("ayala.sbr.devServer", plugin.debug_server);
                 var client = okHttpHelper.client
@@ -120,7 +127,7 @@ var plugin = {
         },
         i(label, msg) {
             JSLogUtils.i(label, JSON.stringify(msg));
-            return this.lograw({
+            return this.raw({
                 level: "info",
                 label: label,
                 msg: msg,
@@ -128,7 +135,7 @@ var plugin = {
         },
         w(label, msg) {
             JSLogUtils.w(label, JSON.stringify(msg));
-            return this.lograw({
+            return this.raw({
                 level: "warn",
                 label: label,
                 msg: msg,
@@ -136,23 +143,30 @@ var plugin = {
         },
         e(label, msg) {
             JSLogUtils.e(label, JSON.stringify(msg));
-            return this.lograw({
+            return this.raw({
                 level: "error",
                 label: label,
                 msg: msg,
             });
         },
+        stackTrace(label, error) {
+            return this.raw({
+                level: "error",
+                label: label,
+                msg: error.message + '\n' + error.stack,
+            });
+        }
     }
 }
 
 // 何言说了，插件生命周期之后提供，那么我们就在这里初始化
 plugin.is_init = (function () {
-    context.preferences.add(new SourcePreference.Switch(
+    plugin.preferences.add(new SourcePreference.Switch(
         "调试模式",
         "ayala.sbr.debug",
         false
     ))
-    context.preferences.add(new SourcePreference.Edit(
+    plugin.preferences.add(new SourcePreference.Edit(
         "调试服务器地址",
         "ayala.sbr.devServer",
         plugin.debug_server
@@ -165,6 +179,7 @@ function PreferenceComponent_getPreference() {
 }
 
 function PageComponent_getMainTabs() {
+    plugin._onBeforeMainTab();
     return plugin._getMainTabs();
 }
 
@@ -177,10 +192,10 @@ function PageComponent_getContent(mainTab, subTab, page) {
 }
 
 // 项目代码开始 ========================================
-plugin.preferences.add(new SourcePreference.Edit(
+plugin.preferences.add(new SourcePreference.Selection(
     "目标地址",
     "ayala.sbr.url",
-    "https://sbr.ayala.workers.dev"
+    "http://example.com",
 ))
 
 plugin.page("首页", tab => {

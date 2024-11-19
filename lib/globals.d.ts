@@ -1,6 +1,7 @@
 // ===== 全局变量与类声明 =====
 declare class ArrayList<T = any> {
     add(element: T): boolean;
+    addAll(elements: T[]): boolean;
     size(): number;
 }
 
@@ -275,7 +276,7 @@ declare class SubTab {
     active: boolean;
     index: number;
 
-    ext:number = this.index;
+    ext: number = this.index;
 }
 
 declare class PlayLine {
@@ -284,6 +285,11 @@ declare class PlayLine {
     id: string;
     label: string;
     episode: ArrayList<Episode>;
+}
+
+declare namespace Cartoon {
+    let STATUS_UNKNOWN: number;
+    let UPDATE_STRATEGY_ALWAYS: number;
 }
 
 declare class Episode {
@@ -296,8 +302,7 @@ declare class Episode {
 
 declare interface CartoonSummary {
     id: string;
-    title: string;
-    url: string;
+    source: string;
 }
 
 declare class PlayerInfo {
@@ -317,7 +322,7 @@ type PageComponent_getMainTabs = () => ArrayList<MainTab>;
 type PageComponent_getSubTabs = (mainTab: MainTab) => ArrayList<SubTab>;
 type PageComponent_getContent = (mainTab: MainTab, subTab: SubTab, key: number) => Pair<number | null, ArrayList<CartoonCoverImpl | CartoonImpl>>;
 // ===== JS源 - 节目信息组件 =====
-type DetailedComponent_getDetailed = (summary: CartoonSummary) => Pair<CartoonImpl, PlayLine>;
+type DetailedComponent_getDetailed = (summary: CartoonSummary) => Pair<CartoonImpl, ArrayList<PlayLine>>;
 // ===== JS源 - 搜索组件 =====
 type SearchComponent_search = (page: number, keyword: string) => Pair<number | null, ArrayList<CartoonCoverImpl>>;
 // ===== JS源 - 播放组件 =====

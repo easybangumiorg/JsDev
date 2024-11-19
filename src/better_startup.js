@@ -1,7 +1,7 @@
 // @key ayala.better_startup
 // @label 更好的起始源
-// @versionName 1.3
-// @versionCode 4
+// @versionName 1.4
+// @versionCode 5
 // @libVersion 11
 
 // 公共代码开始 ========================================
@@ -18,23 +18,26 @@ function BetterPlugin(dev_config) {
     var onBeforePreference_ready = false;
     var onBeforeMainTab_hooks = [];
     var onBeforeMainTab_ready = false;
-
+    
     preferences.add(new SourcePreference.Switch(
-        "调试模式",
-        "ayala.better_startup.debug",
+        "调试模式（非调试状态请勿打开）",
+        "ayala.sbr.debug",
         dev_config.debug_mode
     ));
 
     preferences.add(new SourcePreference.Edit(
         "调试服务器地址",
-        "ayala.better_startup.devServer",
+        "ayala.sbr.devServer",
         dev_config.debug_server
     ))
 
+    if (dev_config.production_mode)
+        preferenceHelper.put("ayala.sbr.debug", 'false');
+
     var log = {
         raw(object) {
-            if (preferenceHelper.get("ayala.better_startup.debug", dev_config.debug_mode) == 'true') {
-                var debug_server = preferenceHelper.get("ayala.better_startup.devServer", dev_config.debug_server);
+            if (preferenceHelper.get("ayala.sbr.debug", dev_config.debug_mode) == 'true') {
+                var debug_server = preferenceHelper.get("ayala.sbr.devServer", dev_config.debug_server);
                 var client = okHttpHelper.client
                 var requestBody = RequestBody.create(
                     MediaType.get('application/json; charset=utf-8'),
@@ -189,6 +192,8 @@ function BetterPlugin(dev_config) {
 }
 
 var plugin = BetterPlugin({
+    // 当生产模式启动时，每次启动都会关闭调试模式
+    production_mode: false,
     // 默认调试配置，以纯纯看番内设置为准
     debug_mode: false,
     debug_server: "http://192.168.0.108:3000",

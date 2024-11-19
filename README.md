@@ -26,28 +26,29 @@ npm install easybangumi-jsdev
 
 ## 类型提示
 
-如果无法正确的获得类型提示，检查是否安装了`IntelliCode`这类插件。
+**你需要在另一个窗口打开`globals.d.ts`文件才能获取类型提示**，这是之后需要解决的问题。
 
-此外，你可以试试打开一下`node_modules/easybangumi-jsdev/lib/globals.d.ts`，或许可以解决类型提示的问题。
+如果无法正确的获得类型提示，检查是否安装了`IntelliCode`这类插件。
 
 ## 启动调试服务器
 
 ```shell
-npx ebjsdev
+npx ebjsdev [path/to/file]
 ```
 
 在插件设置中将调试开关打开，并设置调试服务器的地址即可获取插件运行的日志。
 
 ~~这服务器太简陋了~~
 
-## 同步插件文件到纯纯看番
-
-```shell
-npx ebjsdev path/to/file
-```
-
 你可以在开启调试服务器时设定一个文件路径，用于即时的传递你新修改的插件文件，这个文件会在插件服务器的根目录下获取到。
 
 你也可以在浏览器中直接打开命令行给出的地址查看文件是否被正确的传递。
 
-在`纯纯看番->更多->番源管理->扩展->上方加号->JS文件URL`中设定开发服务器地址即可快速同步插件文件到纯纯看番。
+在`纯纯看番->更多->番源管理->扩展->上方加号->JS文件URL`中输入开发服务器地址即可快速同步插件文件到纯纯看番（目前只能通过复制黏贴的方法加快重载）。
+
+## 例程
+
+- [Better Startup](src/better_startup.js) 更好的项目开始
+- [Jellyfin](src/Jellyfin_v1.7_lib7.js) 使用更好的项目开始构建的在纯纯看番上使用Jellyfin的插件
+
+以上项目需要在[easybangumiorg/JsDev](https://github.com/easybangumiorg/JsDev)中打开

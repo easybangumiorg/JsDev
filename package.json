@@ -1,7 +1,7 @@
 {
   "name": "easybangumi-jsdev",
   "author": "AyalaKaguya",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "为开发纯纯看番JS插件源提供类型与工具链支持",
   "license": "MIT",
   "private": false,

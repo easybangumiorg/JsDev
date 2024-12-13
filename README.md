@@ -51,4 +51,12 @@ npx ebjsdev [path/to/file]
 - [Better Startup](src/better_startup.js) 更好的项目开始
 - [Jellyfin](src/Jellyfin_v1.7_lib7.js) 使用更好的项目开始构建的在纯纯看番上使用Jellyfin的插件
 
-以上项目需要在[easybangumiorg/JsDev](https://github.com/easybangumiorg/JsDev)中打开
+## 计划
+
+对于开发框架**Better Startup**：
+
+- 对插件配置项相关的操作进行包装，简化preferrence的逻辑
+- 将判断标签页类型的逻辑提前，减少多页面时的突发请求数
+- 对搜索能力进行包装
+- 生产模式取消debug开关相关的配置
+- 采用context模式设计API，返回必要的结果，比如有下一页时可以`context.has_next()`

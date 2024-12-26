@@ -270,13 +270,11 @@ declare class MainTab {
 }
 
 declare class SubTab {
-    constructor(label: string, active: boolean, index: number);
+    constructor(label: string, active: boolean, ext: number);
 
     label: string;
     active: boolean;
-    index: number;
-
-    ext: number = this.index;
+    ext: number;
 }
 
 declare class PlayLine {

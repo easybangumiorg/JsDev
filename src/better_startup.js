@@ -18,37 +18,44 @@ function BetterPlugin(dev_config) {
     var onBeforePreference_ready = false;
     var onBeforeMainTab_hooks = [];
     var onBeforeMainTab_ready = false;
-    
-    preferences.add(new SourcePreference.Switch(
-        "调试模式（非调试状态请勿打开）",
-        "ayala.sbr.debug",
-        dev_config.debug_mode
-    ));
-
-    preferences.add(new SourcePreference.Edit(
-        "调试服务器地址",
-        "ayala.sbr.devServer",
-        dev_config.debug_server
-    ))
 
     if (dev_config.production_mode)
-        preferenceHelper.put("ayala.sbr.debug", 'false');
+        preferenceHelper.put("ayala.better_startup.debug", 'false');
+    else {
+        preferences.add(new SourcePreference.Switch(
+            "调试模式（非调试状态请勿打开）",
+            "ayala.better_startup.debug",
+            dev_config.debug_mode
+        ));
+
+        preferences.add(new SourcePreference.Edit(
+            "调试服务器地址",
+            "ayala.better_startup.devServer",
+            dev_config.debug_server
+        ))
+    }
 
     var log = {
         raw(object) {
-            if (preferenceHelper.get("ayala.sbr.debug", dev_config.debug_mode) == 'true') {
-                var debug_server = preferenceHelper.get("ayala.sbr.devServer", dev_config.debug_server);
-                var client = okHttpHelper.client
-                var requestBody = RequestBody.create(
-                    MediaType.get('application/json; charset=utf-8'),
-                    JSON.stringify(object));
-                var request = new Request.Builder()
-                    .url(debug_server + "/log")
-                    .post(requestBody)
-                    .build();
-                var response = client.newCall(request).execute();
-                var responseBody = response.body().string();
-                return responseBody;
+            if (preferenceHelper.get("ayala.better_startup.debug", dev_config.debug_mode) == 'true') {
+                try {
+                    var debug_server = preferenceHelper.get("ayala.better_startup.devServer", dev_config.debug_server);
+                    var client = okHttpHelper.client
+                    var requestBody = RequestBody.create(
+                        MediaType.get('application/json; charset=utf-8'),
+                        JSON.stringify(object));
+                    var request = new Request.Builder()
+                        .url(debug_server + "/log")
+                        .post(requestBody)
+                        .build();
+                    var response = client.newCall(request).execute();
+                    var responseBody = response.body().string();
+                    return responseBody;
+                } catch (error) {
+                    preferenceHelper.put("ayala.better_startup.debug", 'false');
+                    this.e("plugin.log", "调试服务器不可用，已自动关闭调试模式");
+                    this.e("plugin.log", error);
+                }
             }
         },
         i(label, msg) {
@@ -85,6 +92,7 @@ function BetterPlugin(dev_config) {
     }
 
     function checkSubTab(mainTabLabel) {
+        // 检查子页面配置项
         var page = pagemap.get(mainTabLabel);
         if (page.subtab == null) {
             log.i("plugin._checkSubTab", "计算子页面：" + mainTabLabel);
@@ -192,9 +200,9 @@ function BetterPlugin(dev_config) {
 }
 
 var plugin = BetterPlugin({
-    // 当生产模式启动时，每次启动都会关闭调试模式
+    // 生产模式，屏蔽调试配置，但是日志仍会正常输出
     production_mode: false,
-    // 默认调试配置，以纯纯看番内设置为准
+    // 默认调试配置，第一次安装插件是会使用这个配置
     debug_mode: false,
     debug_server: "http://192.168.0.108:3000",
 });
@@ -219,13 +227,19 @@ function PageComponent_getContent(mainTab, subTab, page) {
 
 // 项目代码开始 ========================================
 
-// 配置项，需要借助钩子实现配置项的增加
+// 调试模式开启时，插件会在初始化过程中通过HTTP POST发送日志，如果调试服务器不可达，将会导致初始化失败
+
+// 配置项注册钩子
 plugin.onBeforePreference(preferences => {
+    // ! 一般来说，只有当纯纯看番进入插件配置页面才会触发这个钩子
+    // 只有在这里的preferences中的配置项才会被纯纯看番展示
     preferences.add(new SourcePreference.Edit(
         "目标地址",
         "ayala.better_startup.url",
         "http://example.com",
     ))
+    // 如果你不想在配置页面展示配置项，你可以直接使用preferenceHelper的put与get方法，这是一个简单的KV库
+    // 不需要区分不同插件的key，插件之间的key是隔离的
 })
 
 // 单标签页面
@@ -248,6 +262,7 @@ plugin.page("排期", tab => {
     })
 })
 
+// 当纯纯看番要读取插件首页项目的时候执行的钩子，可以执行IO操作
 plugin.onBeforeMainTab(() => {
     // 需要异步加载的主页放在这里
     plugin.page("我的", tab => {

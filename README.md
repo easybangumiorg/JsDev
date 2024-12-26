@@ -26,7 +26,7 @@ npm install easybangumi-jsdev
 
 ## 类型提示
 
-**你需要在另一个窗口打开`globals.d.ts`文件才能获取类型提示**，这是之后需要解决的问题。
+**你需要在另一个窗口打开`lib.d.ts`文件才能获取类型提示**，这是之后需要解决的问题。
 
 如果无法正确的获得类型提示，检查是否安装了`IntelliCode`这类插件。
 
@@ -55,8 +55,6 @@ npx ebjsdev [path/to/file]
 
 对于开发框架**Better Startup**：
 
-- 对插件配置项相关的操作进行包装，简化preferrence的逻辑
 - 将判断标签页类型的逻辑提前，减少多页面时的突发请求数
 - 对搜索能力进行包装
-- 生产模式取消debug开关相关的配置
 - 采用context模式设计API，返回必要的结果，比如有下一页时可以`context.has_next()`

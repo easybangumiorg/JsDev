@@ -20,17 +20,23 @@ declare namespace Package {
             }
         }
     }
-    namespace kotlin { let _: any; }
-    namespace java { let _: any; }
-    namespace org {
-        namespace jsoup { let _: any; }
+    namespace kotlin {
+        let _: any;
     }
-    namespace okhttp3 { let _: any; }
+    namespace java {
+        let _: any;
+    }
+    namespace org {
+        namespace jsoup {
+            let _: any;
+        }
+    }
+    namespace okhttp3 {
+        let _: any;
+    }
 }
 
-
 declare function importPackage(pkg: any): void;
-
 
 // ===== JS源全局实用工具与帮助函数声明 =====
 declare namespace JSLogUtils {
@@ -90,7 +96,7 @@ declare namespace CaptchaHelper {
         text: string | null,
         title: string | null,
         hint: string | null,
-        onFinish: (result: string) => void
+        onFinish: (result: string) => void,
     ): void;
 }
 
@@ -101,33 +107,84 @@ declare namespace NetworkHelper {
     let defaultAndroidUA: string;
 }
 
+declare class AndroidCookieJar {
+    // AndroidCookieJar 接口，由上层包装
+}
+
 declare namespace OkhttpHelper {
-    let client: OkHttpClient
-    let cloudflareClient: OkHttpClient
-    let cloudflareWebViewClient: OkHttpClient
+    let client: OkHttpClient;
+    let cloudflareClient: OkHttpClient;
+    let cloudflareWebViewClient: OkHttpClient;
+}
+
+declare class OkHttpClient {
+    // OkHttpClient 接口，由上层包装
+}
+
+declare namespace OkhttpUtils {
+    function get(url: string): Request;
+    function post(url: string, body: RequestBody): Request;
+}
+
+declare namespace Request {
+    function Builder(): RequestBuilder;
+}
+
+declare class RequestBuilder {
+    url(url: string): RequestBuilder;
+    header(name: string, value: string): RequestBuilder;
+    get(): Request;
+    post(body: RequestBody): Request;
+    build(): Request;
+}
+
+declare class RequestBody {
+    static create(mediaType: string, content: string): RequestBody;
+}
+
+declare class Response {
+    body(): ResponseBody;
+    code(): number;
+    message(): string;
+}
+
+declare class ResponseBody {
+    string(): string;
+    bytes(): ArrayBuffer;
+}
+
+declare class Call {
+    execute(): Response;
+    enqueue(callback: Callback): void;
+    cancel(): void;
+}
+
+declare interface Callback {
+    onResponse(call: Call, response: Response): void;
+    onFailure(call: Call, e: Error): void;
 }
 
 declare namespace PreferenceHelper {
-    function get(tag: string, default_: string): string
-    function put(tag: string, value: string): void
-    function map(): Map<string, string>
+    function get(tag: string, default_: string): string;
+    function put(tag: string, value: string): void;
+    function map(): Map<string, string>;
 }
 
 declare namespace StringHelper {
     /**
      * 展示纯纯看番样式对话框通知
      */
-    function moeDialog(text: string, title: string | null)
+    function moeDialog(text: string, title: string | null): void;
 
     /**
      * 展示纯纯看番样式站内通知
      */
-    function moeSnackBar(text: string)
+    function moeSnackBar(text: string): void;
 
     /**
      * 弹 toast
      */
-    function toast(text: string)
+    function toast(text: string): void;
 }
 
 declare namespace WebViewHelperV2 {
@@ -141,20 +198,29 @@ declare namespace WebViewHelperV2 {
         needBlob: boolean;
         timeout: number;
 
-        constructor(url: string, reg: string, encode: string, user_agent: string, header: Map<string, string> | null, action_js: string | null, needBlob: boolean, timeout: number);
+        constructor(
+            url: string,
+            reg: string,
+            encode: string,
+            user_agent: string,
+            header: Map<string, string> | null,
+            action_js: string | null,
+            needBlob: boolean,
+            timeout: number,
+        );
     }
 
     interface RenderedResult {
         // 策略
-        strategy: RenderedStrategy,
+        strategy: RenderedStrategy;
         // 网址
-        url: string,
+        url: string;
         // 是否超时
-        isTimeout: boolean,
+        isTimeout: boolean;
         // 网页源码
-        content: string,
+        content: string;
         // 拦截资源
-        interceptResource: string,
+        interceptResource: string;
     }
 
     function renderHtml(strategy: RenderedStrategy): RenderedResult | null;
@@ -207,7 +273,12 @@ declare namespace SourcePreference {
     class Selection extends BasePreference {
         default_: string;
         options: string[];
-        constructor(label: string, key: string, default_: string, options: string[]);
+        constructor(
+            label: string,
+            key: string,
+            default_: string,
+            options: string[],
+        );
     }
 }
 
@@ -219,7 +290,14 @@ declare class CartoonCoverImpl {
     intro: string;
     cover: string;
 
-    constructor(id: string, source_key: string, url: string, title: string, intro: string, cover: string);
+    constructor(
+        id: string,
+        source_key: string,
+        url: string,
+        title: string,
+        intro: string,
+        cover: string,
+    );
 }
 
 declare class CartoonImpl {
@@ -235,28 +313,40 @@ declare class CartoonImpl {
     isUpdate: boolean;
     status: number;
 
-    constructor(id: string, source_key: string, url: string, title: string, genreList: string[], cover: string, intro: string, description: string, updateStrategy: number, isUpdate: boolean, status: number);
+    constructor(
+        id: string,
+        source_key: string,
+        url: string,
+        title: string,
+        genreList: string[],
+        cover: string,
+        intro: string,
+        description: string,
+        updateStrategy: number,
+        isUpdate: boolean,
+        status: number,
+    );
 }
 
 declare function makeCartoonCover(info: {
-    id: string,
-    url: string,
-    title: string,
-    intro: string,
-    cover: string
+    id: string;
+    url: string;
+    title: string;
+    intro: string;
+    cover: string;
 }): CartoonCoverImpl;
 
 declare function makeCartoon(info: {
-    id: string,
-    url: string,
-    title: string,
-    genreList: string[],
-    cover: string,
-    intro: string,
-    description: string,
-    updateStrategy: number,
-    isUpdate: boolean,
-    status: number
+    id: string;
+    url: string;
+    title: string;
+    genreList: string[];
+    cover: string;
+    intro: string;
+    description: string;
+    updateStrategy: number;
+    isUpdate: boolean;
+    status: number;
 }): CartoonImpl;
 
 declare class MainTab {
@@ -313,15 +403,82 @@ declare class PlayerInfo {
     url: string;
 }
 
-// ===== JS源 - 源首选项组件 =====
-type PreferenceComponent_getPreference = () => ArrayList<SourcePreference.BasePreference>;
-// ===== JS源 - 页面呈现组件 =====
-type PageComponent_getMainTabs = () => ArrayList<MainTab>;
-type PageComponent_getSubTabs = (mainTab: MainTab) => ArrayList<SubTab>;
-type PageComponent_getContent = (mainTab: MainTab, subTab: SubTab, key: number) => Pair<number | null, ArrayList<CartoonCoverImpl | CartoonImpl>>;
-// ===== JS源 - 节目信息组件 =====
-type DetailedComponent_getDetailed = (summary: CartoonSummary) => Pair<CartoonImpl, ArrayList<PlayLine>>;
-// ===== JS源 - 搜索组件 =====
-type SearchComponent_search = (page: number, keyword: string) => Pair<number | null, ArrayList<CartoonCoverImpl>>;
-// ===== JS源 - 播放组件 =====
-type PlayComponent_getPlayInfo = (summary: CartoonSummary, playline: PlayLine, episode: Episode) => PlayerInfo;
+// ===== JS 源 - WebProxy 相关 =====
+declare class WebView {
+    // WebView 接口，由 WebViewProxyKtWrapper 包装
+}
+
+declare namespace WebProxyProvider {
+    function getWebProxy(): WebViewProxy;
+}
+
+declare class WebViewProxy {
+    loadUrl(
+        url: string,
+        userAgent?: string | null,
+        headers?: Map<string, string> | null,
+        interceptResRegex?: string | null,
+        needBlob?: boolean,
+    ): void;
+
+    waitingForPageLoaded(timeout?: number): boolean;
+
+    waitingForResourceLoaded(
+        resourceRegex: string,
+        sticky?: boolean,
+        timeout?: number,
+    ): string | null;
+
+    href(url: string, cleanLoaded?: boolean): void;
+
+    getContent(timeout?: number): string | null;
+
+    getContentWithIframe(timeout?: number): string | null;
+
+    waitingForBlobText(
+        urlRegex?: string | null,
+        textRegex?: string | null,
+        sticky?: boolean,
+        timeout?: number,
+    ): Pair<string | null, string | null> | null;
+
+    executeJavaScript(script: string, delay?: number): string | null;
+
+    delay(delay: number): void;
+
+    close(): void;
+
+    addToWindow(show: boolean): void;
+}
+
+declare let Inject_WebProxyProvider: typeof WebProxyProvider;
+
+// ===== JS 源 - 异常类 =====
+declare class ParserException {
+    constructor(message: string);
+}
+
+// ===== JS 源 - 其他工具 =====
+declare class URLEncoder {
+    static encode(str: string, charset: string): string;
+}
+
+declare class StringBuilder {
+    constructor();
+    append(str: string): StringBuilder;
+    toString(): string;
+}
+
+declare class HashMap<K, V> {
+    put(key: K, value: V): V | null;
+    get(key: K): V | null;
+    containsKey(key: K): boolean;
+    remove(key: K): V | null;
+    clear(): void;
+    size(): number;
+    isEmpty(): boolean;
+}
+
+declare let System: {
+    currentTimeMillis(): number;
+};
